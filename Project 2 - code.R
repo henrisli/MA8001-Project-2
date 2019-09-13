@@ -13,9 +13,9 @@ for (i in 2:250){
 }
 df = data.frame(x = x, y = y)
 
-ggplot(df, aes(x = 1:250, y = x)) + geom_line() + labs(x = "x", title = "Simulated values for x") + theme_classic()
+ggplot(df, aes(x = 1:250, y = x)) + geom_line() + labs(x = "i", y = "x", title = "Generated sample for x") + theme_classic(base_size = 19)
 
-ggplot(df, aes(x = 1:250, y = y)) + geom_point() + labs(x = "x", title = "Simulated values for y") + theme_classic()
+ggplot(df, aes(x = 1:250, y = y)) + geom_point() + labs(x = "i", y = "y", title = "Generated sample for y") + theme_classic(base_size = 19)
 
 # Exercise b)
 
@@ -66,7 +66,7 @@ dfll = data.frame(x = p_values, y = tau_values, llik = as.vector(likelihood_valu
 dfll_dot = data.frame(x = optimal$par[1], y = optimal$par[2])
 
 ggplot() + geom_contour(data = dfll, aes(x = x, y = y, z = llik, col = "Loglikelihood"), show.legend = T) +
-  geom_point(data = dfll_dot, aes(x = x, y = y,col = "Computed optimal"), size = 4, alpha = 0.7) + labs(x = "p", y = "tau", title = "Loglikelihood of y, as function of p and tau")
+  geom_point(data = dfll_dot, aes(x = x, y = y,col = "Computed optimal"), size = 4, alpha = 0.7) + labs(x = "p", y = "tau", title = "Loglikelihood of y, as function of p and tau") + theme_classic(base_size = 19)
 
 
 # Exercise c)
@@ -111,3 +111,27 @@ for (t in 250:2){
   propagation[t,3] = back_transition[t,3]/backward_prob[t-1,2]
   propagation[t,4] = back_transition[t,4]/backward_prob[t-1,2]
 }
+
+df2 = data.frame(prob_0 = backward_prob[,1], prob_1 = backward_prob[,2])
+ggplot(df2, aes(x = 1:250, y = prob_1)) + geom_line() + labs(x = "i", y = "prob x_i = 1", title = "Computed marginal probabilities for x_i = 1") + theme_classic(base_size = 19)
+
+x_est = rep(NA, 250)
+x_est[1] = ifelse(runif(1)<backward_prob[1,2], 1, 0)
+for (t in 2:250){
+  x_est[t] = ifelse(runif(1) < propagation[t,as.integer(2*(1+x_est[t-1]))], 1, 0)
+}
+
+df3 = data.frame(x = x_est)
+
+ggplot(df3, aes(x = 1:250, y = x)) + geom_line() + labs(x = "i", y = "x", title = "Simulated values for x based on FB-algorithm") + theme_classic(base_size = 19)
+
+
+# Exercise d)
+
+df4 = data.frame(markov = round(backward_prob[,2]), indep = ifelse(y<0.5, 0, 1))
+ggplot(df4, aes(x = 1:250)) + geom_line(aes(y = markov)) + labs(x = "i", y = "x", title = "Predicted values for x based on Markov property") + theme_classic(base_size = 19)
+ggplot(df4, aes(x = 1:250)) + geom_line(aes(y = indep, col = "Independent")) + labs(x = "x", title = "Predicted values for x based on independence ") + theme_classic(base_size = 19)
+
+
+df2 = data.frame(prob_0 = backward_prob[,1], prob_1 = backward_prob[,2], prob_1_indep = dnorm(y,1,tau)/(dnorm(y,1,tau)+dnorm(y,0,tau)))
+ggplot(df2, aes(x = 1:250)) + geom_line(size = 1.2, aes(y = prob_1, col = "Markov")) + geom_line(size = 0.1, aes(y = prob_1_indep, col = "Independent")) + labs(x = "i", y = "prob x_i = 1", title = "Probability of x_i = 1 for Markov and independence assumptions") + theme_classic(base_size = 19)
