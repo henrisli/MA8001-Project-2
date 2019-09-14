@@ -1,11 +1,12 @@
 library(ggplot2)
-
+set.seed(26061993)
 # Exercise a)
 tau = 0.4
+p = 0.9
 x = c(sample(c(0,1),1),rep(NA,249))
 y = c(x[1] + rnorm(1,0,tau), rep(NA,249))
 for (i in 2:250){
-  if (runif(1)>0.1){
+  if (runif(1)<p){
     x[i] = x[i-1]
   }
   else{x[i] = 1-x[i-1]}
@@ -130,7 +131,7 @@ ggplot(df3, aes(x = 1:250, y = x)) + geom_line() + labs(x = "i", y = "x", title 
 
 df4 = data.frame(markov = round(backward_prob[,2]), indep = ifelse(y<0.5, 0, 1))
 ggplot(df4, aes(x = 1:250)) + geom_line(aes(y = markov)) + labs(x = "i", y = "x", title = "Predicted values for x based on Markov property") + theme_classic(base_size = 19)
-ggplot(df4, aes(x = 1:250)) + geom_line(aes(y = indep)) + labs(x = "x", title = "Predicted values for x based on independence ") + theme_classic(base_size = 19)
+ggplot(df4, aes(x = 1:250)) + geom_line(aes(y = indep)) + labs(x = "i",y = "x", title = "Predicted values for x based on independence ") + theme_classic(base_size = 19)
 
 
 df2 = data.frame(prob_0 = backward_prob[,1], prob_1 = backward_prob[,2], prob_1_indep = dnorm(y,1,tau)/(dnorm(y,1,tau)+dnorm(y,0,tau)))
